@@ -6,23 +6,23 @@
 
 #region ----- TESTING -----------
 int Count = 0;
-for (int ii = 0; ii < 5;  ii++) {
+for (int ii = 0; ii < 10;  ii++) {
     Random random = new Random();
     Heap<int> heap = new();
     List<int> list = new List<int>();
 
-    for (int i = 0; i < 1000; i++) {
-        if (new Random().NextDouble() > (0.8 - ii * 0.1)) {
-            var n = random.Next(1, 100 * (ii + 1));
+    for (int i = 0; i < 500 ; i++) {
+        if (new Random().NextDouble() > (0.8 - ii * 0.05)) {
+            var n = random.Next(1, 10 * (ii + 10));
             heap.Add(n);
             list.Add(n);
-            list.Sort();
         } else {
             try {
                 var Val = heap.Remove();
+                list.Sort();
                 var listVal = list[0];
                 list.RemoveAt(0);
-                Console.WriteLine($"{++Count:D4}. Heap {Val:D4} == List {listVal:D4}   --- Count={heap.Count():D3}");
+                Console.WriteLine($"{++Count:D4}. Heap {Val:D4} == List {listVal:D4}   --- H.Count={heap.Count():D3}");
 
                 if (Val != listVal) { Console.WriteLine("Error!!!"); Console.ReadLine(); }
             } catch (Exception ex) {
@@ -56,8 +56,8 @@ public class Heap<T> where T: IComparable<T> {
         int parent = ((index + 1) / 2 - 1);
 
         if (parent >= 0) {
-            if (list[parent].CompareTo(list[index]) == 1) {
-                (list[parent], list[index]) = (list[index], list[parent]); //swap
+            if (list[parent].CompareTo(list[index]) == 1) { //swap if parent > child
+                (list[parent], list[index]) = (list[index], list[parent]);
                 SiftUp(parent);
             }
         }
@@ -71,16 +71,18 @@ public class Heap<T> where T: IComparable<T> {
         return item;
     }
     void SiftDown(int index) {
-        int child = ((index + 1) * 2 - 1);
+        int leftChild = ((index + 1) * 2 - 1);
+        int rightChild = leftChild + 1;
+        int miniChild = index;
 
-        if ((child < Ct) && list[index].CompareTo(list[child]) == 1) {   //compare with left child
-            (list[index], list[child]) = (list[child], list[index]);
-            SiftDown(child);  //travers left child after swap
-        }
+        if (rightChild < Ct ) //compare left and right child and determine the min child
+            miniChild = (list[leftChild].CompareTo(list[rightChild]) == 1)? rightChild : leftChild;
+        else if (leftChild < Ct) //if only left exists
+            miniChild = leftChild;
 
-        if ((child + 1 < Ct) && list[index].CompareTo(list[child + 1]) == 1) {  //compare with right child
-            (list[index], list[child + 1]) = (list[child + 1], list[index]);
-            SiftDown(child + 1);  //traverse right child after swap
+        if (miniChild != index && list[index].CompareTo(list[miniChild]) == 1) {
+            (list[index], list[miniChild]) = (list[miniChild], list[index]);
+            SiftDown(miniChild);
         }
     }
 }
